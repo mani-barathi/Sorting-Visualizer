@@ -32,7 +32,7 @@ class App:
 		self.clock = pygame.time.Clock()
 		self.bars = []
 		self.is_sorting = False
-		self.info_text = '1. Bubble Sort      2 . Merge Sort  '
+		self.info_text = '1. Bubble Sort         2 . Merge Sort           3. Quick Sort'
 		self.is_sorted = False
 		self.createBars()
 
@@ -83,7 +83,7 @@ class App:
 					time.sleep(TIME_DELAY)
 					self.bars[j].length,self.bars[j+1].length = self.bars[j+1].length,self.bars[j].length
 				self.colorChange(j,j+1,BLUE)
-			self.bars[NO_OF_BARS-i-1].color = DARK_GREEN   # for the sorted bars
+			self.bars[NO_OF_BARS-i-1].color = PURPLE   # for the sorted bars
 
 	def sorting(self,alg):
 		self.is_sorting = True
@@ -92,6 +92,8 @@ class App:
 			self.bubbleSort()
 		elif alg == 2:
 			self.mergeSort(0,NO_OF_BARS-1)
+		elif alg ==3:
+			self.quickSort(0,NO_OF_BARS-1)
 
 		self.greenBars()
 		self.is_sorting = False
@@ -154,6 +156,37 @@ class App:
 			self.bars[p].color = BLUE
 			k+=1
 
+	def partition(self,l,r):
+		i = l-1
+		j = l
+		pivot = self.bars[r].length
+		self.bars[r].color = YELLOW
+		time.sleep(TIME_DELAY)
+		for j in range(l,r):
+			self.bars[j].color = CRIMSON
+			time.sleep(TIME_DELAY)
+			if self.bars[j].length < pivot:
+				i+=1
+				self.colorChange(i,j,GREEN)
+				time.sleep(TIME_DELAY_SMALL)
+				self.bars[i].length, self.bars[j].length = self.bars[j].length, self.bars[i].length
+
+			self.colorChange(i,j,BLUE)
+		i+=1
+		self.colorChange(i,r,GREEN)
+		time.sleep(TIME_DELAY_SMALL)
+		self.bars[i].length, self.bars[r].length = self.bars[r].length, self.bars[i].length	
+		self.colorChange(i,r,BLUE)	
+		self.bars[i].color = PURPLE
+		return i
+
+	def quickSort(self,l,r):
+		if l<r:
+			new_index = self.partition(l,r)
+			self.quickSort(l,new_index-1)
+			self.quickSort(new_index+1,r)
+
+
 def main():	
 	app = App()
 	flag =True
@@ -169,6 +202,9 @@ def main():
 					t.start()
 				elif event.key == pygame.K_2 and not app.is_sorted:
 					t = threading.Thread(target=App.sorting,args=(app,2))
+					t.start()
+				elif event.key == pygame.K_3 and not app.is_sorted:
+					t = threading.Thread(target=App.sorting,args=(app,3))
 					t.start()
 				elif event.key == pygame.K_0:
 					app.randomizeBars()
